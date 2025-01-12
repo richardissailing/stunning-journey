@@ -2,6 +2,7 @@ coverage/
 .coverage
 coverage.xml
 htmlcov/
+node_modles/
 **/__pycache__/
 *.cover
 *.coverage

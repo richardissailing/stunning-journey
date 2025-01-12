@@ -11,6 +11,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
+    "@opentelemetry/auto-instrumentations-node": "^0.55.2",
     "@opentelemetry/exporter-jaeger": "^1.30.0",
     "@opentelemetry/instrumentation-express": "^0.47.0",
     "@opentelemetry/instrumentation-http": "^0.57.0",
@@ -32,8 +33,11 @@
     "supertest": "^6.3.3"
   },
   "jest": {
-    "transform": {},
-    "testEnvironment": "node"
+  "transform": {},
+  "testEnvironment": "node",
+  "moduleNameMapper": {
+    "^@opentelemetry/auto-instrumentations-node$": "<rootDir>/__mocks__/@opentelemetry/auto-instrumentations-node/index.js"
+    }
   },
   "eslintConfig": {
     "env": {
