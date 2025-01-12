@@ -1,4 +1,3 @@
-import './tracing.js';
 import express from 'express';
 import * as promClient from 'prom-client';
 import winston from 'winston';
