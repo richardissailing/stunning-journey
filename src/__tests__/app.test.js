@@ -1,9 +1,3 @@
-import { jest } from '@jest/globals';
-jest.mock('@opentelemetry/auto-instrumentations-node', () => ({
-  getNodeAutoInstrumentations: () => ({})
-}));
-
-
 import request from 'supertest';
 import app from '../app.js';
 
