@@ -18,10 +18,9 @@
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "linear",
-            "spanNulls": false,
-            "showPoints": "auto"
+            "spanNulls": false
           },
-          "unit": "short"
+          "unit": "reqps"
         }
       },
       "gridPos": {
@@ -33,32 +32,17 @@
       "id": 1,
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
           "expr": "rate(http_requests_total{job=~\"blue|green\"}[1m])",
           "legendFormat": "{{job}} - {{route}}"
         }
       ],
-      "title": "Request Rate",
+      "title": "Request Rate by Deployment",
       "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "linear",
-            "spanNulls": false,
-            "showPoints": "auto"
-          },
-          "unit": "s"
-        }
+        "type": "loki",
+        "uid": "P8E80F9AEF21F6940"
       },
       "gridPos": {
         "h": 8,
@@ -69,29 +53,50 @@
       "id": 2,
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "rate(http_request_duration_seconds_sum{job=~\"blue|green\"}[1m]) / rate(http_request_duration_seconds_count{job=~\"blue|green\"}[1m])",
-          "legendFormat": "{{job}} - {{route}}"
+          "expr": "{container=~\"devtakehome_app.*\"} | json",
+          "refId": "A"
         }
       ],
-      "title": "Response Time",
-      "type": "timeseries"
+      "title": "Application Logs",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "jaeger",
+        "uid": "PC7FD701B62F12AC7"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "targets": [
+        {
+          "datasource": {
+            "type": "jaeger",
+            "uid": "PC7FD701B62F12AC7"
+          },
+          "query": "service=app-blue OR service=app-green",
+          "refId": "A"
+        }
+      ],
+      "title": "Traces",
+      "type": "traces"
     }
   ],
   "refresh": "5s",
-  "schemaVersion": 36,
+  "schemaVersion": 38,
   "style": "dark",
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-15m",
     "to": "now"
   },
-  "title": "Blue/Green Deployment",
+  "title": "Application Monitoring",
   "version": 0
 }

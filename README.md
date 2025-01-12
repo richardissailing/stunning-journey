@@ -1,194 +1,187 @@
 # DevOps Implementation Project
 
-This project demonstrates a complete DevOps setup for a Node.js application, featuring CI/CD pipeline, monitoring, and blue/green deployment strategy.
+A comprehensive DevOps setup for a Node.js application featuring blue/green deployment, monitoring, tracing, and log aggregation.
 
 ## Features
 
-### CI/CD Pipeline
-- Automated testing and deployment using GitHub Actions
-- Docker containerization
-- Blue/Green deployment strategy
-- Automated rollback on failure
+### Core Infrastructure
+- Blue/Green Deployment Strategy
+- Nginx Load Balancer
+- Docker Containerization
+- Automated Testing and CI/CD
 
 ### Monitoring Stack
 - Prometheus metrics collection
 - Grafana dashboards
-- Custom application metrics
-- Health check endpoints
-- Request duration tracking
-- Error rate monitoring
+- Jaeger distributed tracing
+- Loki log aggregation
+- Health check monitoring
 
-### Infrastructure
-- Containerized Node.js application
-- Nginx load balancer
-- Blue/Green deployment setup
-- Docker Compose orchestration
+## Quick Start
 
-## Prerequisites
-
+### Prerequisites
 - Docker and Docker Compose
 - Node.js (for local development)
 - Git
 
-## Project Structure
+### Project Structure
 ```
 .
 ├── .github/
-│   └── workflows/
-│       └── main.yml           # CI/CD pipeline configuration
+│   └── workflows/          # CI/CD pipeline configurations
 ├── grafana/
-│   ├── dashboards/           # Grafana dashboard definitions
-│   └── provisioning/         # Grafana provisioning configs
+│   ├── dashboards/        # Grafana dashboard definitions
+│   └── provisioning/      # Grafana configuration
+│       └── datasources/   # Datasource configurations
 ├── nginx/
-│   └── nginx.conf            # Nginx load balancer configuration
+│   └── nginx.conf         # Load balancer configuration
 ├── prometheus/
-│   ├── prometheus.yml        # Prometheus configuration
-│   └── rules/               # Alert rules
-├── src/
-│   ├── app.js              # Main application code
-│   ├── server.js           # Server entry point
-│   └── metrics.js          # Metrics configuration
-├── docker-compose.blue-green.yml  # Blue/Green deployment
-└── Dockerfile             # Application containerization
+│   └── prometheus.yml     # Prometheus configuration
+├── src/                   # Application source code
+├── docker-compose.blue-green.yml
+└── Dockerfile
 ```
 
-## Quick Start
+### Getting Started
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/richardissailing/stunning-journey.git
-cd stunning-journey
+git clone <repository-url>
+cd <repository-name>
 ```
 
-2. Start with blue/green deployment:
+2. Start the services:
 ```bash
 docker-compose -f docker-compose.blue-green.yml up -d
 ```
 
-## Accessing Services
+### Service Endpoints
 
 - Blue Deployment: http://localhost:3002
 - Green Deployment: http://localhost:3003
 - Load Balancer: http://localhost:80
+- Grafana: http://localhost:3001 (admin/admin)
 - Prometheus: http://localhost:9090
-- Grafana: http://localhost:3001 (login: admin/admin)
+- Jaeger UI: http://localhost:16686
+- Loki: http://localhost:3100
 
-## Blue/Green Deployment
+## Deployment
 
-### Manual Switching
+### Blue/Green Deployment
+
+Switch between deployments:
 ```bash
-# Switch to green deployment
-./switch-deployment.sh green
-
-# Switch to blue deployment
-./switch-deployment.sh blue
+./scripts/switch-deployment.sh blue  # Switch to blue deployment
+./scripts/switch-deployment.sh green # Switch to green deployment
 ```
 
-### Testing Deployments
+Test deployments:
 ```bash
-# Run deployment tests
-./test-deployment.sh
+./scripts/test-deployment.sh
 ```
 
-## Monitoring
+### Monitoring
 
-### Available Metrics
-The application exposes the following metrics at `/metrics`:
+#### Metrics
+Access application metrics at `/metrics` endpoint in Prometheus format:
 - HTTP request duration
 - Request counts by endpoint
 - Error rates
 - Node.js runtime metrics
 
-### Grafana Dashboards
-1. Access Grafana at http://localhost:3001
-2. Login with admin/admin
-3. Navigate to Dashboards
-4. Select "Blue/Green Deployment Dashboard"
+#### Tracing
+Distributed tracing with Jaeger:
+- Request tracing across services
+- Performance bottleneck identification
+- Error tracking
 
-### Key Metrics
-- Request Rate by Deployment
-- Response Time by Deployment
-- Error Rate
-- Memory Usage
-- Health Status
+#### Logging
+Log aggregation with Loki:
+- Centralized logging
+- Structured log format
+- Real-time log tailing
 
-## Development
+### Testing
 
-1. Install dependencies:
-```bash
-npm install
-```
-
-2. Run tests:
+Run the test suite:
 ```bash
 npm test
 ```
 
-3. Local development:
+Generate test traffic:
 ```bash
-npm run dev
-```
-
-## CI/CD Pipeline
-
-The GitHub Actions pipeline includes:
-1. Automated testing
-2. Docker image building
-3. Container registry publishing
-4. Blue/Green deployment
-5. Automatic rollback on failure
-
-## Troubleshooting
-
-### Common Issues
-
-1. Port Conflicts
-```bash
-# Check for port usage
-sudo lsof -i :<port>
-# Stop conflicting service or modify port in docker-compose
-```
-
-2. Deployment Switching Issues
-```bash
-# Verify services
-docker-compose -f docker-compose.blue-green.yml ps
-# Check logs
-docker-compose -f docker-compose.blue-green.yml logs
-```
-
-3. Monitoring Issues
-```bash
-# Verify Prometheus targets
-curl http://localhost:9090/targets
-# Check metrics endpoint
-curl http://localhost:3002/metrics
-```
-
-4. Grafana Issues
-```bash
-# Check Grafana logs
-docker-compose -f docker-compose.blue-green.yml logs grafana
-# Verify datasource
-curl -u admin:admin http://localhost:3001/api/datasources
+./test-traffic.sh
 ```
 
 ## Configuration
 
 ### Environment Variables
-- `NODE_ENV`: Set environment (development/production)
-- `PORT`: Application port (default: 3000)
-- `DEPLOYMENT_COLOR`: Blue/Green deployment identifier
+```
+NODE_ENV=production
+DEPLOYMENT_COLOR=[blue|green]
+```
 
 ### Prometheus Configuration
-Prometheus is configured to scrape metrics from:
+Target metrics endpoints:
 - Blue deployment (app-blue:3000)
 - Green deployment (app-green:3000)
 - Prometheus itself
 
 ### Nginx Configuration
-The load balancer is configured to:
-- Route traffic to active deployment
-- Handle health checks
-- Provide zero-downtime switching
+Load balancer settings:
+- Health check endpoints
+- Proxy configuration
+- Zero-downtime switching
+
+## Troubleshooting
+
+### Common Issues
+
+1. Service Health Check
+```bash
+# Check service status
+docker-compose -f docker-compose.blue-green.yml ps
+
+# View service logs
+docker-compose -f docker-compose.blue-green.yml logs [service-name]
+```
+
+2. Deployment Issues
+```bash
+# Verify deployments
+curl http://localhost:3002/health
+curl http://localhost:3003/health
+```
+
+3. Monitoring
+```bash
+# Check Prometheus targets
+curl http://localhost:9090/api/v1/targets
+
+# Verify metrics endpoint
+curl http://localhost:3002/metrics
+```
+
+4. Logging
+```bash
+# Check Loki logs
+curl -X GET "http://localhost:3100/loki/api/v1/query" 
+```
+
+### Best Practices
+
+1. Deployment
+- Always verify health checks before switching
+- Use gradual rollout for changes
+- Monitor metrics during deployment
+
+2. Monitoring
+- Set up alerts for critical metrics
+- Regular dashboard reviews
+- Keep monitoring overhead low
+
+3. Logging
+- Use structured logging
+- Include request IDs
+- Set appropriate log levels
 

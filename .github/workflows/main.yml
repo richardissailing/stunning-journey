@@ -79,8 +79,6 @@ jobs:
       - name: Deploy application
         run: |
           echo "Starting deployment of version ${{ github.sha }}"
-          # Add your actual deployment commands here
-          # For example, using kubectl, ssh, or a deployment service
       
       - name: Monitor deployment
         env:

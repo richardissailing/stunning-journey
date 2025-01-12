@@ -1,96 +1,70 @@
-import express from 'express';
-import winston from 'winston';
-import { register, metrics } from './metrics.js';
+require('./tracing').setupTracing(process.env.DEPLOYMENT_COLOR || 'app');
+
+const express = require('express');
+const promClient = require('prom-client');
+const winston = require('winston');
 
 const app = express();
 
-// Configure logging
+// Prometheus metrics setup
+const register = new promClient.Registry();
+promClient.collectDefaultMetrics({ register });
+
+// Create custom metrics
+const httpRequestDuration = new promClient.Histogram({
+    name: 'http_request_duration_seconds',
+    help: 'Duration of HTTP requests in seconds',
+    labelNames: ['method', 'route', 'code'],
+    buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5]
+});
+register.registerMetric(httpRequestDuration);
+
+// Logging setup
 const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.json(),
-  defaultMeta: { service: 'express-app' },
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' })
-  ]
+    level: 'info',
+    format: winston.format.json(),
+    defaultMeta: { service: process.env.DEPLOYMENT_COLOR || 'app' },
+    transports: [
+        new winston.transports.Console()
+    ]
 });
 
-// Request logging and metrics middleware
+// Middleware for metrics and logging
 app.use((req, res, next) => {
-  const start = Date.now();
-  const end = metrics.httpRequestDuration.startTimer();
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    const labels = {
-      method: req.method,
-      route: req.route?.path || req.path,
-      status_code: res.statusCode
-    };
-    // Record metrics
-    end(labels);
-    metrics.httpRequestTotal.inc(labels);
-    // Log request
-    logger.info('Request processed', {
-      ...labels,
-      duration,
-      userAgent: req.get('user-agent')
+    const start = Date.now();
+    
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        const labels = {
+            method: req.method,
+            route: req.route?.path || req.path,
+            code: res.statusCode
+        };
+        
+        httpRequestDuration.observe(labels, duration / 1000);
+        
+        logger.info('Request processed', {
+            ...labels,
+            duration,
+            userAgent: req.get('user-agent')
+        });
     });
-  });
-  next();
+    
+    next();
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  const labels = {
-    method: req.method,
-    route: req.route?.path || req.path,
-    error_type: err.name || 'UnknownError'
-  };
-  metrics.httpRequestErrors.inc(labels);
-  logger.error('Error occurred', {
-    error: err.message,
-    stack: err.stack,
-    path: req.path,
-    method: req.method
-  });
-  res.status(500).json({
-    error: 'Internal Server Error',
-    requestId: req.id
-  });
-});
-
-// Health check endpoint
+// Routes
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+    res.json({ status: 'ok' });
 });
 
-// Metrics endpoint
 app.get('/metrics', async (req, res) => {
-  try {
     res.set('Content-Type', register.contentType);
-    res.end(await register.metrics());
-  } catch (err) {
-    logger.error('Error generating metrics', { error: err });
-    res.status(500).end(err);
-  }
+    res.send(await register.metrics());
 });
 
-// Root endpoint
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to the Express.js example app!' });
+    res.json({ message: 'Welcome to the app!' });
 });
 
-// Sample data endpoint
-app.get('/api/data', (req, res) => {
-  global.setTimeout(() => {
-    res.json({ data: 'Sample data response' });
-  }, Math.random() * 1000);
-});
-
-// Error endpoint
-app.get('/api/error', (req, res, next) => {
-  next(new Error('Test error endpoint'));
-});
-
-export default app;
+module.exports = app;
