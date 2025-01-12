@@ -48,7 +48,6 @@ This project demonstrates a complete DevOps setup for a Node.js application, fea
 │   ├── app.js              # Main application code
 │   ├── server.js           # Server entry point
 │   └── metrics.js          # Metrics configuration
-├── docker-compose.yml      # Standard deployment
 ├── docker-compose.blue-green.yml  # Blue/Green deployment
 └── Dockerfile             # Application containerization
 ```
@@ -57,16 +56,11 @@ This project demonstrates a complete DevOps setup for a Node.js application, fea
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd <repository-name>
+git clone https://github.com/richardissailing/stunning-journey.git
+cd stunning-journey
 ```
 
-2. Start the standard stack:
-```bash
-docker-compose up -d
-```
-
-Or start with blue/green deployment:
+2. Start with blue/green deployment:
 ```bash
 docker-compose -f docker-compose.blue-green.yml up -d
 ```
