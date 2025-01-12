@@ -3,3 +3,8 @@
 {"duration":253,"level":"info","message":"Request processed","method":"GET","route":"/api/data","service":"express-app","status_code":200}
 {"duration":26,"level":"info","message":"Request processed","method":"GET","route":"/api/error","service":"express-app","status_code":500}
 {"duration":7,"level":"info","message":"Request processed","method":"GET","route":"/metrics","service":"express-app","status_code":200}
+{"duration":4,"level":"info","message":"Request processed","method":"GET","route":"/health","service":"express-app","status_code":200}
+{"duration":1,"level":"info","message":"Request processed","method":"GET","route":"/","service":"express-app","status_code":200}
+{"duration":129,"level":"info","message":"Request processed","method":"GET","route":"/api/data","service":"express-app","status_code":200}
+{"duration":17,"level":"info","message":"Request processed","method":"GET","route":"/api/error","service":"express-app","status_code":500}
+{"duration":7,"level":"info","message":"Request processed","method":"GET","route":"/metrics","service":"express-app","status_code":200}

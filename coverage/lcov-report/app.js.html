@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>36/40</span>
+                <span class='fraction'>30/36</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">16.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>1/6</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>36/40</span>
+                <span class='fraction'>30/36</span>
             </div>
         
             
@@ -166,24 +166,9 @@
 <a name='L101'></a><a href='#L101'>101</a>
 <a name='L102'></a><a href='#L102'>102</a>
 <a name='L103'></a><a href='#L103'>103</a>
-<a name='L104'></a><a href='#L104'>104</a>
-<a name='L105'></a><a href='#L105'>105</a>
-<a name='L106'></a><a href='#L106'>106</a>
-<a name='L107'></a><a href='#L107'>107</a>
-<a name='L108'></a><a href='#L108'>108</a>
-<a name='L109'></a><a href='#L109'>109</a>
-<a name='L110'></a><a href='#L110'>110</a>
-<a name='L111'></a><a href='#L111'>111</a>
-<a name='L112'></a><a href='#L112'>112</a>
-<a name='L113'></a><a href='#L113'>113</a>
-<a name='L114'></a><a href='#L114'>114</a>
-<a name='L115'></a><a href='#L115'>115</a>
-<a name='L116'></a><a href='#L116'>116</a>
-<a name='L117'></a><a href='#L117'>117</a>
-<a name='L118'></a><a href='#L118'>118</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L104'></a><a href='#L104'>104</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -198,27 +183,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -250,6 +214,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -298,10 +270,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const express = require('express');
-const promClient = require('prom-client');
 const winston = require('winston');
+const { register, metrics } = require('./metrics');
 &nbsp;
-// Create Express app
 const app = express();
 &nbsp;
 // Configure logging
@@ -316,43 +287,22 @@ const logger = winston.createLogger({
     ]
 });
 &nbsp;
-// Prometheus setup
-const register = new promClient.Registry();
-promClient.collectDefaultMetrics({ register });
-&nbsp;
-// Custom metrics
-const httpRequestDuration = new promClient.Histogram({
-    name: 'http_request_duration_seconds',
-    help: 'Duration of HTTP requests in seconds',
-    labelNames: ['method', 'route', 'status_code'],
-    buckets: [0.1, 0.5, 1, 2, 5]
-});
-&nbsp;
-const httpRequestTotal = new promClient.Counter({
-    name: 'http_requests_total',
-    help: 'Total number of HTTP requests',
-    labelNames: ['method', 'route', 'status_code']
-});
-&nbsp;
-register.registerMetric(httpRequestDuration);
-register.registerMetric(httpRequestTotal);
-&nbsp;
-// Request logging middleware
+// Request logging and metrics middleware
 app.use((req, res, next) =&gt; {
     const start = Date.now();
-    const end = httpRequestDuration.startTimer();
+    const end = metrics.httpRequestDuration.startTimer();
 &nbsp;
     res.on('finish', () =&gt; {
         const duration = Date.now() - start;
-        const labels = { 
-            method: req.method, 
-            route: req.route?.path || <span class="branch-1 cbranch-no" title="branch not covered" >req.path, </span>
-            status_code: res.statusCode 
+        const labels = {
+            method: req.method,
+            route: req.route?.path || <span class="branch-1 cbranch-no" title="branch not covered" >req.path,</span>
+            status_code: res.statusCode
         };
 &nbsp;
         // Record metrics
         end(labels);
-        httpRequestTotal.inc(labels);
+        metrics.httpRequestTotal.inc(labels);
 &nbsp;
         // Log request
         logger.info('Request processed', {
@@ -367,6 +317,14 @@ app.use((req, res, next) =&gt; {
 &nbsp;
 // Error handling middleware
 app.use(<span class="fstat-no" title="function not covered" >(e</span>rr, req, res, next) =&gt; {
+    const labels = <span class="cstat-no" title="statement not covered" >{</span>
+        method: req.method,
+        route: req.route?.path || req.path,
+        error_type: err.name || 'UnknownError'
+    };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    metrics.httpRequestErrors.inc(labels);</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >    logger.error('Error occurred', {</span>
         error: err.message,
         stack: err.stack,
@@ -380,7 +338,7 @@ app.use(<span class="fstat-no" title="function not covered" >(e</span>rr, req, r
     });
 });
 &nbsp;
-// Health check endpoint (updated to match test expectations)
+// Health check endpoint
 app.get('/health', (req, res) =&gt; {
     res.status(200).json({ status: 'ok' });
 });
@@ -401,14 +359,14 @@ app.get('/', (req, res) =&gt; {
     res.json({ message: 'Welcome to the Express.js example app!' });
 });
 &nbsp;
-// Sample data endpoint (added to match test expectations)
+// Sample data endpoint
 app.get('/api/data', (req, res) =&gt; {
     setTimeout(() =&gt; {
         res.json({ data: 'Sample data response' });
     }, Math.random() * 1000);
 });
 &nbsp;
-// Error endpoint (added to match test expectations)
+// Error endpoint
 app.get('/api/error', (req, res, next) =&gt; {
     next(new Error('Test error endpoint'));
 });
@@ -421,7 +379,7 @@ module.exports = app;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-12T03:04:00.088Z
+                at 2025-01-12T04:04:02.904Z
             </div>
         <script src="prettify.js"></script>
         <script>
