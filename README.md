@@ -24,6 +24,24 @@ A comprehensive DevOps setup for a Node.js application featuring blue/green depl
 - Node.js (for local development)
 - Git
 
+### Docker Configuration
+Before starting, ensure Docker is properly configured:
+
+1. Configure Docker DNS:
+```json
+{
+    "dns": ["8.8.8.8", "8.8.4.4"],
+    "dns-opts": ["ndots:1"],
+    "mtu": 1500,
+    "ipv6": false
+}
+```
+
+2. Apply configuration:
+```bash
+sudo systemctl restart docker
+```
+
 ### Project Structure
 ```
 .
@@ -33,11 +51,13 @@ A comprehensive DevOps setup for a Node.js application featuring blue/green depl
 │   ├── dashboards/        # Grafana dashboard definitions
 │   └── provisioning/      # Grafana configuration
 │       └── datasources/   # Datasource configurations
+├── loki/                  # Loki configuration
 ├── nginx/
 │   └── nginx.conf         # Load balancer configuration
 ├── prometheus/
 │   └── prometheus.yml     # Prometheus configuration
 ├── src/                   # Application source code
+├── promtail/              # Loki configuration
 ├── docker-compose.blue-green.yml
 └── Dockerfile
 ```
@@ -50,13 +70,19 @@ git clone <repository-url>
 cd <repository-name>
 ```
 
-2. Start the services:
+2. Start the services in order:
 ```bash
-docker-compose -f docker-compose.blue-green.yml up -d
+# Start core services
+docker-compose -f docker-compose.blue-green.yml up -d nginx prometheus grafana
+
+# Start applications
+docker-compose -f docker-compose.blue-green.yml up -d app-blue app-green
+
+# Start monitoring services
+docker-compose -f docker-compose.blue-green.yml up -d jaeger loki
 ```
 
 ### Service Endpoints
-
 - Blue Deployment: http://localhost:3002
 - Green Deployment: http://localhost:3003
 - Load Balancer: http://localhost:80
@@ -137,7 +163,16 @@ Load balancer settings:
 
 ### Common Issues
 
-1. Service Health Check
+1. Docker DNS Issues
+```bash
+# Check Docker DNS configuration
+cat /etc/docker/daemon.json
+
+# Verify DNS resolution
+docker run busybox nslookup google.com
+```
+
+2. Service Health Check
 ```bash
 # Check service status
 docker-compose -f docker-compose.blue-green.yml ps
@@ -146,14 +181,18 @@ docker-compose -f docker-compose.blue-green.yml ps
 docker-compose -f docker-compose.blue-green.yml logs [service-name]
 ```
 
-2. Deployment Issues
+3. Deployment Issues
 ```bash
 # Verify deployments
 curl http://localhost:3002/health
 curl http://localhost:3003/health
+
+# Check container logs
+docker logs devtakehome_app-blue_1
+docker logs devtakehome_app-green_1
 ```
 
-3. Monitoring
+4. Monitoring
 ```bash
 # Check Prometheus targets
 curl http://localhost:9090/api/v1/targets
@@ -162,26 +201,11 @@ curl http://localhost:9090/api/v1/targets
 curl http://localhost:3002/metrics
 ```
 
-4. Logging
+5. Logging
 ```bash
 # Check Loki logs
-curl -X GET "http://localhost:3100/loki/api/v1/query" 
+curl -X GET "http://localhost:3100/loki/api/v1/query"
+
+# Verify log collection
+docker-compose -f docker-compose.blue-green.yml logs loki
 ```
-
-### Best Practices
-
-1. Deployment
-- Always verify health checks before switching
-- Use gradual rollout for changes
-- Monitor metrics during deployment
-
-2. Monitoring
-- Set up alerts for critical metrics
-- Regular dashboard reviews
-- Keep monitoring overhead low
-
-3. Logging
-- Use structured logging
-- Include request IDs
-- Set appropriate log levels
-
