@@ -159,53 +159,79 @@ Load balancer settings:
 - Proxy configuration
 - Zero-downtime switching
 
-## Troubleshooting
+## Testing the Setup
 
-### Common Issues
+### Generate test traffic:
 
-1. Docker DNS Issues
-```bash
-# Check Docker DNS configuration
-cat /etc/docker/daemon.json
-
-# Verify DNS resolution
-docker run busybox nslookup google.com
+```
+# Simple traffic generator
+while true; do
+  curl localhost:3002/
+  curl localhost:3003/
+  sleep 1
+done
 ```
 
-2. Service Health Check
-```bash
-# Check service status
-docker-compose -f docker-compose.blue-green.yml ps
+View results in:
 
-# View service logs
-docker-compose -f docker-compose.blue-green.yml logs [service-name]
-```
+* Grafana dashboards (metrics)
+* Jaeger UI (traces)
+* Loki (logs)
 
-3. Deployment Issues
-```bash
-# Verify deployments
-curl http://localhost:3002/health
-curl http://localhost:3003/health
+## Architectural Decisions
 
-# Check container logs
-docker logs devtakehome_app-blue_1
-docker logs devtakehome_app-green_1
-```
+### 1. Blue/Green Deployment Strategy
+**Decision**: Implemented blue/green deployment using Docker Compose and Nginx as a load balancer.
+**Rationale**:
+- Zero-downtime deployments
+- Easy rollback capability
+- Simple health check verification
+- No need for complex orchestration tools for this scale
 
-4. Monitoring
-```bash
-# Check Prometheus targets
-curl http://localhost:9090/api/v1/targets
+**Trade-offs**:
+- Requires double the resources as both versions run simultaneously
+- More complex initial setup compared to simple deployments
+- Higher memory usage due to running multiple instances
 
-# Verify metrics endpoint
-curl http://localhost:3002/metrics
-```
+### 2. Monitoring Stack
+**Decision**: Used Prometheus, Grafana, Jaeger, and Loki for comprehensive monitoring.
+**Rationale**:
+- Prometheus: Industry standard for metrics collection
+- Grafana: Rich visualization capabilities
+- Jaeger: Distributed tracing for performance analysis
+- Loki: Log aggregation that integrates well with Grafana
 
-5. Logging
-```bash
-# Check Loki logs
-curl -X GET "http://localhost:3100/loki/api/v1/query"
+**Trade-offs**:
+- Higher resource usage with multiple monitoring tools
+- More complex configuration needed
+- Learning curve for team members
 
-# Verify log collection
-docker-compose -f docker-compose.blue-green.yml logs loki
-```
+### 3. Container Strategy
+**Decision**: Used multi-stage Docker builds and alpine-based images.
+**Rationale**:
+- Smaller final image size
+- Better security with minimal dependencies
+- Faster deployment times
+
+**Trade-offs**:
+- More complex Dockerfile
+- Potential debugging challenges in minimal images
+- Need to explicitly add debugging tools when needed
+
+
+## Assumptions Made
+
+1. Scale Requirements:
+- Assumed moderate traffic load
+- Single region deployment
+- No specific high availability requirements
+
+2. Security Requirements:
+- Basic authentication for Grafana
+- No specific security compliance needs
+- Internal network for monitoring tools
+
+3. Operational Requirements:
+- Team familiarity with Docker
+- No specific backup requirements
+- Manual intervention acceptable for rollbacks
